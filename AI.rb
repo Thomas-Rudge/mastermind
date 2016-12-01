@@ -1,9 +1,7 @@
 class AI
   def initialize
     @last_pegs = Array.new
-    @guesses = nil
     @guess_count = -1
-    @bad_colours = Array.new
     @valid_chars = [:R, :G, :O, :B, :P, :T]
     @permutations = @valid_chars.repeated_permutation(4).to_a
   end

@@ -1,11 +1,7 @@
 require_relative 'printer'
 require_relative 'AI'
 
-AFFIRM = ["y", "yes", "yep", "sure", "ok", "okay"]
-QUIT   = ["q", "quit", "exit"]
-
 BASE_COLOUR = "\e[0;36m"
-PERMUTATIONS = [:R, :G, :O, :B, :P, :T].repeated_permutation(4).to_a
 
 class Game
   include Printer
@@ -16,7 +12,7 @@ class Game
     special_print(0, ">>", BASE_COLOUR, "\t")
     response = gets.chomp
 
-    (AFFIRM.include? response.downcase.strip) ? nil : finish
+    (["y", "yes", "ok", "okay"].include? response.downcase.strip) ? nil : finish
 
     while true
       special_print(0, "Would you like to be the codemaker or codebreaker?\n", BASE_COLOUR)
@@ -26,7 +22,7 @@ class Game
       if ["codebreaker", "codemaker", "0", "1"].include? response
         response = {"codebreaker"=>0, "codemaker"=>1, "0"=>0, "1"=>1}[response]
         break
-      elsif QUIT.include? response
+      elsif ["q", "quit"].include? response
         finish
       else
         special_print(0, "That is not a valid response: #{response}\n", BASE_COLOUR)
@@ -77,16 +73,16 @@ class Board
                 :W =>"\e[47m\e[30m", # WHITE/GREY
                 nil=>"\e[0m"}        # Default
 
+  PERMUTATIONS = [:R, :G, :O, :B, :P, :T].repeated_permutation(4).to_a
   BORDER_COLOUR = "\e[37m" # BLACK
-
   PREFIX = " " * 20
 
   def initialize(game, type)
     @game      = game
-    @type      = type #0 - Codebreaker : 1 - Codemaker
+    @type      = type # 0 - Codebreaker : 1 - Codemaker
     @guesses   = Array.new(12).map! { |x| x=Array.new(4) }
     @code      = nil
-    @hint_pegs = Array.new # Not nil because length is check before first play
+    @hint_pegs = Array.new # Not nil because array method applied before first play
 
     @ai = AI.new unless @type == 0
   end
@@ -145,7 +141,7 @@ class Board
     return [nil] * 4 unless _guess[0]
     guess = _guess.clone
     black_pegs = Array.new
-    white_pegs  = Array.new
+    white_pegs = Array.new
 
     @code.zip(guess).select { |x, y| x == y }.length.times do
       black_pegs << :Bl
