@@ -92,9 +92,7 @@ class Board
   end
 
   def create
-    puts "CODE #{@code}"
-    puts "Guesses from create #{@guesses}"
-    #clear_screen
+    clear_screen
     print_pipe = lambda { special_print(0 ,"|", BORDER_COLOUR) }
     dynamic_chars = {:Bl=>:*, :W=>:-, nil=>" ", 0=>"  ", 1=>"__"}
     text_format   = {0=>"30m", 1=>"4;30m"}
@@ -104,7 +102,8 @@ class Board
     special_print(0, " __ __ __ __ _ _\n", BORDER_COLOUR, PREFIX)
     @guesses.each do |guess| # Go through each guess
       key_pegs = key_peg_generator(guess)
-      2.times do |i| #Because each row is two rows tall in the shell
+      #Because each row is two rows tall in the shell
+      2.times do |i|
         special_print(0, "", nil, PREFIX)
         # Go through each colour in the guess
         guess.each do |peg|
@@ -175,8 +174,9 @@ class Board
     until result
       create
       result = check_game_status
+
       break if result
-      puts "Guess OBID #{@guesses.object_id}"
+
       result = @type == 0 ? turn : @ai.invoke(@guesses, @hint_pegs)
 
       @guesses.each_with_index do |guess, index|
@@ -217,7 +217,7 @@ class Board
   end
 
   def codebreaker
-    @code   = PERMUTATIONS.sample
+    @code = PERMUTATIONS.sample
   end
 
   def turn

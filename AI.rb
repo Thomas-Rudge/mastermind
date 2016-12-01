@@ -65,6 +65,7 @@ class AI
           (x.include? guess[2]) &&
           (x.include? guess[3])
         end
+
         if pegs.count(:W) == 4
           until response
             response = guess.shuffle
@@ -84,15 +85,9 @@ class AI
       end
     end
 
-    response = @permutations.sample unless response
-
-
+    response = @permutations.sample unless response # Always ensure response
     @guess_count += 1
-    puts "response #{response}"
-    puts "valids #{@valid_chars}"
-    puts "permutations #{@permutations.length}"
 
     response
   end
-
 end
