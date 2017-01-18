@@ -1,18 +1,18 @@
 class AI
   def initialize
-    @last_pegs = Array.new
-    @guess_count = -1
-    @valid_chars = [:R, :G, :O, :B, :P, :T]
+    @last_pegs    = Array.new
+    @guess_count  = -1
+    @valid_chars  = [:R, :G, :O, :B, :P, :T]
     @permutations = @valid_chars.repeated_permutation(4).to_a
   end
 
   def invoke(latest_guesses, latest_pegs)
     sleep 0.8 # Because fast AI are scary
-    guesses = Marshal.load(Marshal.dump(latest_guesses))
-    pegs = Marshal.load(Marshal.dump(latest_pegs))
+    guesses  = Marshal.load(Marshal.dump(latest_guesses))
+    pegs     = Marshal.load(Marshal.dump(latest_pegs))
     response = nil # This will be returned
-    pegs.compact!
-    guess = guesses[@guess_count]
+    pegs     = pegs.compact
+    guess    = guesses[@guess_count]
     @permutations -= [guess] # Don't make the same guess twice
     # First guess is one random character
     if @guess_count == -1
@@ -30,7 +30,7 @@ class AI
       case
       when pegs.length == 0
         guess.uniq.each do |char|
-          @permutations.reject! { |x| x.include? char }
+          @permutations = @permutations.reject { |x| x.include? char }
           @valid_chars -= [char]
         end
 
@@ -52,28 +52,21 @@ class AI
           @valid_chars -= [guess[-1]]
         end
 
-        response = guess[0, 2] + ([@valid_chars.sample] * 2)
+        until response
+          response = guess[0, 2] + ([@valid_chars.sample] * 2)
+          response = response == guess ? nil : response
+        end
       when pegs.length == 3
         @valid_chars -= [guess[-1]]
         response = guess[0, 3] + [@valid_chars.sample]
       when pegs.length == 4
-        @permutations.select! do |x|
-          (x.include? guess[0]) &&
-          (x.include? guess[1]) &&
-          (x.include? guess[2]) &&
-          (x.include? guess[3])
-        end
+        @permutations = @permutations.select { |x| x.sort == guess.sort }
 
         if pegs.count(:W) == 4
           until response
             response = guess.shuffle
             response = (@permutations.include? response) ? response : nil
           end
-        elsif pegs.count(:Bl) == 2 &&
-              guess.uniq.length == 2 &&
-              guess.count(guess[0]) == 2
-          response = [guess[0], guess[2]] * 2
-          response = (@permutations.include? response) ? response : response.rotate
         else
           until response
             response = [true, false].sample ? guess.shuffle : guess.rotate
